@@ -1,0 +1,7 @@
+db-data-volume
+
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
