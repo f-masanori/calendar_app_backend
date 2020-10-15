@@ -70,7 +70,7 @@ func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonEvents)
 }
-func (e *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+func (e *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	log.Println(" (e *EventHandler) DeleteEvent")
 	type Request struct {
 		EventID int `json:"EventID,string"`
@@ -87,6 +87,7 @@ func (e *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println(r.Method)
 	// uid := Authentication.FirebaseUID
 	e.Service.DeleteEvent(Authentication.FirebaseUID, request.EventID)
+	return 200, nil, nil
 }
 func (e *EventHandler) GetNextEventID(w http.ResponseWriter, r *http.Request) {
 	log.Println(" (e *EventHandler) GetNextEventID")

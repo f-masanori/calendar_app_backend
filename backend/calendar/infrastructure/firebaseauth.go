@@ -8,13 +8,39 @@ import (
 	"strings"
 
 	firebase "firebase.google.com/go"
+	"firebase.google.com/go/auth"
 	"google.golang.org/api/option"
 )
 
 var FirebaseUID string
 
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+type FirebaseAuth struct {
+	serviceAccountKeyPath string
+	authClient            *auth.Client
+}
+
+func NewFirebaseAuth(serviceAccountKeyPath string) *FirebaseAuth {
+	return &FirebaseAuth{
+		serviceAccountKeyPath: serviceAccountKeyPath,
+		authClient:            nil,
+	}
+}
+func (f *FirebaseAuth) Init(serviceAccountKeyPath string) error {
+	opt := option.WithCredentialsFile(serviceAccountKeyPath)
+	fb, err := firebase.NewApp(context.Background(), nil, opt)
+	if err != nil {
+		return err
+	}
+	f.authClient, err = fb.Auth(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed init auth client. %s", err)
+	}
+	return nil
+}
+
+func (f *FirebaseAuth) FBAuth(next http.Handler) http.Handler {
+	//現在改善中
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		opt := option.WithCredentialsFile("/go/src/golang/calendarapp-dcbd5-firebase-adminsdk-9fhv7-acb24a0067.json")
 		// fmt.Print(opt)
@@ -43,5 +69,5 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		FirebaseUID = uid.(string)
 
 		next.ServeHTTP(w, r)
-	}
+	})
 }
