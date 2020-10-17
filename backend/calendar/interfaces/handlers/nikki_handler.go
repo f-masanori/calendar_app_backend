@@ -29,7 +29,7 @@ func NewNikkiHandler(sqlHandler *database.SqlHandler) *NikkiHandler {
 	}
 }
 
-func (h *NikkiHandler) Index(w http.ResponseWriter, r *http.Request) {
+func (h *NikkiHandler) Index(w http.ResponseWriter, r *http.Request)  (int, interface{}, error){
 	fmt.Println("nikkihandler index")
 
 	/* handler call service  */
