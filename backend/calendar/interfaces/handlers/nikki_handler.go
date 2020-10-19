@@ -29,29 +29,29 @@ func NewNikkiHandler(sqlHandler *database.SqlHandler) *NikkiHandler {
 	}
 }
 
-func (h *NikkiHandler) Index(w http.ResponseWriter, r *http.Request)  (int, interface{}, error){
-	fmt.Println("nikkihandler index")
+// func (h *NikkiHandler) Index(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+// 	fmt.Println("nikkihandler index")
 
-	/* handler call service  */
-	nikkis, err := h.Service.GetAll()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	/* ************ */
+// 	/* handler call service  */
+// 	nikkis, err := h.Service.GetAll()
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+// 	/* ************ */
 
-	/* presenter */
-	// users構造体 → json変換
-	json_nikkis, err := json.Marshal(nikkis)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+// 	/* presenter */
+// 	// users構造体 → json変換
+// 	json_nikkis, err := json.Marshal(nikkis)
+// 	if err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json_nikkis)
-	/* ********* */
-}
+// 	w.Header().Set("Content-Type", "application/json")
+// 	w.Write(json_nikkis)
+// 	/* ********* */
+// }
 
 func (h *NikkiHandler) GetNikki(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r) //パスパラメータ取得

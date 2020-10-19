@@ -46,7 +46,7 @@ func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) {
 	// uid := Authentication.FirebaseUID
 	e.Service.CreateEvent(Authentication.FirebaseUID, request.EventID, request.Date, request.InputEvent)
 }
-func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) {
+func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	log.Println(" (e *EventHandler) GetEventsByUID")
 	// type Request struct {
 	// 	Date       string `json:"Date"`
@@ -64,11 +64,10 @@ func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) {
 	jsonEvents, err := json.Marshal(_Response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return 200, nil, nil
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonEvents)
+	return 200, jsonEvents, nil
 }
 func (e *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	log.Println(" (e *EventHandler) DeleteEvent")

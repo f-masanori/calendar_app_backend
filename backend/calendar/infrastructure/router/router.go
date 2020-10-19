@@ -36,7 +36,7 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	router := mux.NewRouter()
 	DBhandler := database.NewSqlHandler(datasource)
 	router.Use(middleware.CORS)
-	auth := Auth.NewFirebaseAuth(serviceAccountKeyPath)
+	// auth := Auth.NewFirebaseAuth(serviceAccountKeyPath)
 	authMiddleware := Auth.NewFirebaseAuth(serviceAccountKeyPath)
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
@@ -56,9 +56,14 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	)
 	userHandler := handlers.NewUserHandler(DBhandler)
 	eventHandler := handlers.NewEventHandler(DBhandler)
-	allInOneHandler := handlers.NewAllInOneHandler(DBhandler)
-	todoHandler := handlers.NewTodoHandler(DBhandler)
-	router.Methods(http.MethodGet).Path("/me").Handler(authChain.Then(AppHandler{eventHandler.DeleteEvent}))
+	// todoHandler := handlers.NewTodoHandler(DBhandler)
+
+	/* REST APIに変更中 */
+
+	router.Methods(http.MethodGet).Path("/event").Handler(authChain.Then(AppHandler{eventHandler.GetEventsByUID}))
+	/* /registerUser  →　/user*/
+	router.Methods(http.MethodPost).Path("/user").Handler(authChain.Then(AppHandler{userHandler.NewUser}))
+
 	// router.HandleFunc("/addEvent", auth.FBAuth(eventHandler.AddEvent))
 	// router.HandleFunc("/getEventsByUID", auth.FBAuth(eventHandler.GetEventsByUID))
 	// router.HandleFunc("/registerUser", userHandler.NewUser)

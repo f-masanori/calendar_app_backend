@@ -23,7 +23,7 @@ func NewUserHandler(sqlHandler *database.SqlHandler) *UserHandler {
 		},
 	}
 }
-func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	log.Println("(h *UserHandler) NewUser")
 	/* handler マッピング*/
 	type Request struct {
@@ -52,10 +52,9 @@ func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) {
 	json_user, err := json.Marshal(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return 500, nil, err
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json_user)
+	return 200, json_user, nil
 	/* ******* */
 }
 
