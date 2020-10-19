@@ -11,27 +11,25 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+//このGetaAllは開発者向け
 func TestGetAllSuccess(t *testing.T) {
-	/* テストのためのconfig実体作成
-	 */
+
 	conf.Test()
-
-	/* テスト用データベースに接続(configでテストDBを決める) */
 	DBhandler := database.TestNewSqlHandler()
-
 	NewUserService := NewUserService(DBhandler)
 
 	users, err := NewUserService.GetAll()
+	if err != nil {
+		t.Fatalf("failed test %#v", err)
+	}
 
 	expected := "entities.Users"
 	autual := reflect.TypeOf(users).String()
 
 	if autual != expected {
-		t.Fatalf("failed test %#v", "返り値型エラー")
+		t.Fatalf("failed test %#v", "user_seivece :GetAll - 返り値型エラー")
 	}
-	if err != nil {
-		t.Fatalf("failed test %#v", err)
-	}
+
 }
 
 // func TestStoreNewUserSuccess(t *testing.T) {

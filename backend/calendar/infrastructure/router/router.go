@@ -16,22 +16,6 @@ import (
 	"github.com/rs/cors"
 )
 
-type AppHandler struct {
-	h func(http.ResponseWriter, *http.Request) (int, interface{}, error)
-}
-
-func (a AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	status, res, err := a.h(w, r)
-	if err != nil {
-		httputil.RespondErrorJson(w, status, err)
-		return
-	}
-	httputil.RespondJSON(w, status, res)
-	return
-}
 func Run(datasource string, serviceAccountKeyPath string, port int) {
 	router := mux.NewRouter()
 	DBhandler := database.NewSqlHandler(datasource)
@@ -80,4 +64,21 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 
 	fmt.Printf("Listening on port %d", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+}
+
+type AppHandler struct {
+	h func(http.ResponseWriter, *http.Request) (int, interface{}, error)
+}
+
+func (a AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	status, res, err := a.h(w, r)
+	if err != nil {
+		httputil.RespondErrorJson(w, status, err)
+		return
+	}
+	httputil.RespondJSON(w, status, res)
+	return
 }

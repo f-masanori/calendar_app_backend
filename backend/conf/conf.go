@@ -1,5 +1,6 @@
 package conf
 
+/* 設定情報はアプリ実行時に挿入されるが、テスト用のために残している */
 type Database_ struct {
 	Drivername string
 	Host       string
