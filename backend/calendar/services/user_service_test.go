@@ -2,11 +2,9 @@ package services
 
 import (
 	"golang/calendar/conf"
-	"testing"
-
-	// "go_docker/mynikki/entities"
 	"golang/calendar/infrastructure/database"
 	"reflect"
+	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 )

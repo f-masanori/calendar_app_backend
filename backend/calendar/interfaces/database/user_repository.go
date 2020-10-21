@@ -102,7 +102,6 @@ func (repo *UserRepository) FindAll() (entities.Users, error) {
 }
 
 func (repo *UserRepository) DeleteUser(id int) (int, error) {
-	//DeleteUserでは紐づけられたnikkiも削除する
 	//トランザクションを使用する
 	tx, err := repo.SqlHandler.DB.Begin() // トランザクションを開始
 	if err != nil {
@@ -117,7 +116,7 @@ func (repo *UserRepository) DeleteUser(id int) (int, error) {
 		}
 		rowsAffect_int64, err := result.RowsAffected()
 
-		stmt2, _ := tx.Prepare("DELETE FROM nikkis WHERE user_id = ?")
+		stmt2, _ := tx.Prepare("DELETE FROM user WHERE user_id = ?")
 		_, err = stmt2.Exec(id)
 		if err != nil {
 			return -1, err

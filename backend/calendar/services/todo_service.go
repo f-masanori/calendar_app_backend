@@ -19,12 +19,6 @@ func (s *TodoService) AddTodo(uid string, todoID int, todo string) {
 	AllInOne作成時には必ず必要な動作なのでe.AllInOneRepository.CreateAllInOneに
 	入れ込む(トランザクション処理も可能になるため) */
 	s.TodoRepository.CreateTodo(uid, todoID, todo)
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(nikki)
-	// return nikki, err
 }
 func (s *TodoService) GetTodosByUID(uid string) (entities.Todos, int) {
 	/* AllInOne作成時にNextAllInOneIDを更新する必要あり
@@ -34,7 +28,6 @@ func (s *TodoService) GetTodosByUID(uid string) (entities.Todos, int) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	// fmt.Println(nikki)
 	return todos, nextTodoID
 }
 func (s *TodoService) DeleteTodo(uid string, todoID int) {
@@ -43,9 +36,4 @@ func (s *TodoService) DeleteTodo(uid string, todoID int) {
 	入れ込む(トランザクション処理も可能になるため) */
 	s.TodoRepository.DeleteTodo(uid, todoID)
 
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(nikki)
-	// return nikki, err
 }

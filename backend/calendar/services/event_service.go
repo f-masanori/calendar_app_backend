@@ -22,11 +22,6 @@ func (e *EventService) CreateEvent(uid string, eventID int, date string, event s
 	入れ込む(トランザクション処理も可能になるため) */
 	e.EventRepository.CreateEvent(uid, eventID, date, event)
 
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(nikki)
-	// return nikki, err
 }
 func (e *EventService) GetEventsByUID(uid string) (entities.Events, int) {
 	events, nextEventID, err := e.EventRepository.GetEventsByUID(uid)
@@ -36,11 +31,7 @@ func (e *EventService) GetEventsByUID(uid string) (entities.Events, int) {
 	fmt.Print("events, nextEventID : ")
 	fmt.Println(events, nextEventID)
 	return events, nextEventID
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println(nikki)
-	// return nikki, err
+
 }
 func (e *EventService) DeleteEvent(UID string, eventID int) {
 	e.EventRepository.DeleteEvent(UID, eventID)

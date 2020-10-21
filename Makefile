@@ -8,3 +8,30 @@ export GOOGLE_APPLICATION_CREDENTIALS=$(HOME)/.config/gcloud/calendar_service_ac
 
 dcu:
 	docker-compose up
+
+DB_SERVICE:=db
+mysql/client:
+	docker-compose exec $(DB_SERVICE) mysql -uroot -hlocalhost -pmysql $(DBNAME)
+
+mysql/init:
+	docker-compose exec $(DB_SERVICE) \
+		mysql -u root -h localhost -pmysql \
+		-e "create database \`$(DBNAME)\`"
+
+__mysql/drop:
+	docker-compose exec $(DB_SERVICE) \
+		mysql -u root -h localhost -pmysql \
+		-e "drop database \`$(DBNAME)\`"
+
+MIGRATION_SERVICE:=migration
+flyway/info:
+	docker-compose run --rm $(MIGRATION_SERVICE) $(FLYWAY_CONF) info
+
+flyway/migrate:
+	docker-compose run --rm $(MIGRATION_SERVICE) $(FLYWAY_CONF) migrate
+
+flyway/repair:
+	docker-compose run --rm $(MIGRATION_SERVICE) $(FLYWAY_CONF) repair
+
+flyway/baseline:
+	docker-compose run --rm $(MIGRATION_SERVICE) $(FLYWAY_CONF) baseline
