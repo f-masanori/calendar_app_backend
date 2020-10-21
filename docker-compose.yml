@@ -19,7 +19,7 @@ services:
             - db
         container_name: calendar-app-migration
         volumes:
-            - ./database/migration/schema:/flyway/sql
+            - ./database/:/flyway/sql/
 
     backend-api:
         build:

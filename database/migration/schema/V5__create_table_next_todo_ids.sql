@@ -1,6 +1,4 @@
-
--- +migrate Up
-CREATE TABLE IF NOT EXISTS next_todo_ids (
+CREATE TABLE next_todo_ids (
   id int(11) unsigned not null auto_increment,
   uid varchar(255) not null,
   next_todo_id int(11) unsigned not null,
@@ -8,5 +6,3 @@ CREATE TABLE IF NOT EXISTS next_todo_ids (
   updated_at datetime not null default current_timestamp on update current_timestamp,
   primary key (id)
 );
--- +migrate Down
-DROP TABLE IF EXISTS next_todo_ids;

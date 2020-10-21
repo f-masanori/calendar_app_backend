@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS todos (
+CREATE TABLE todos (
   id int(11) unsigned not null auto_increment,
   uid varchar(255) not null,
   todo_id int(11) unsigned not null,
