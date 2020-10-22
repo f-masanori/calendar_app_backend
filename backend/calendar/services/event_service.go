@@ -12,6 +12,11 @@ type EventRepository interface {
 	GetNextEventID(string) int
 	EditEvent(string, int, string, string, string, string)
 }
+
+/*
+EventServiceのEventRepositoryはEventRepositoryインターフェイスを満たすメソッド群を持っておけばなんでも良い
+→DBの種類には依存していない
+*/
 type EventService struct {
 	EventRepository EventRepository
 }
