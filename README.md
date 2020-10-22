@@ -4,7 +4,8 @@
 
 サマーインターンを終えて、以前作成したカレンダーアプリのバックエンド(apiサーバー)に修正したい部分がたくさん見つかったので、学習もかねて改善したいと思ってはじめました。
 
-修正前→(https://github.com/f-masanori/calendar_app)　readmeが汚いです
+修正前→(https://github.com/f-masanori/calendar_app)　
+readmeが汚いです
 
 ### 目的
 
