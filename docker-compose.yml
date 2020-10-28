@@ -27,7 +27,7 @@ services:
         command: reflex -r '\.go$$' -s -- sh -c 'go run main.go -databaseDatasource="${DATABASE_DATASOURCE}" -serviceAccountKeyPath=/tmp/serviceAccount.json -port=8080'
         container_name: calendar-app-api
         ports:
-            - 1989:1989
+            - 8080:8080
         volumes:
             - ./backend:/usr/local/go/src/app
             - ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/serviceAccount.json

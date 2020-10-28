@@ -24,7 +24,7 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	authMiddleware := Auth.NewFirebaseAuth(serviceAccountKeyPath)
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedHeaders: []string{"Authorization"},
+		AllowedHeaders: []string{"*"},
 		AllowedMethods: []string{
 			http.MethodHead,
 			http.MethodGet,
@@ -32,38 +32,41 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 			http.MethodPut,
 			http.MethodPatch,
 			http.MethodDelete,
+			http.MethodOptions,
 		},
 	})
-	authChain := alice.New(
+	commonChain := alice.New(
 		corsMiddleware.Handler,
+	)
+	authChain := commonChain.Append(
 		authMiddleware.FBAuth,
 	)
+
 	userHandler := handlers.NewUserHandler(DBhandler)
 	eventHandler := handlers.NewEventHandler(DBhandler)
 	// todoHandler := handlers.NewTodoHandler(DBhandler)
 
 	/* REST APIに変更中 */
+	// fmt.Println("Listening on d")
 
 	router.Methods(http.MethodGet).Path("/event").Handler(authChain.Then(AppHandler{eventHandler.GetEventsByUID}))
-	/* /registerUser  →　/user*/
-	router.Methods(http.MethodPost).Path("/user").Handler(authChain.Then(AppHandler{userHandler.NewUser}))
-
+	router.Methods(http.MethodPost).Path("/user").Handler(commonChain.Then(AppHandler{userHandler.NewUser}))
+	router.Methods(http.MethodGet).Path("/user/{id}").Handler(authChain.Then(AppHandler{eventHandler.GetEventsByUID}))
 	// router.HandleFunc("/addEvent", auth.FBAuth(eventHandler.AddEvent))
 	// router.HandleFunc("/getEventsByUID", auth.FBAuth(eventHandler.GetEventsByUID))
 	// router.HandleFunc("/registerUser", userHandler.NewUser)
 	// router.HandleFunc("/deleteEvent", auth.FBAuth(eventHandler.DeleteEvent))
 	// router.HandleFunc("/editEvent", auth.FBAuth(eventHandler.EditEvent))
-	// router.HandleFunc("/getNextEventID", auth.FBAuth(eventHandler.GetNextEventID))
-
+	// router.HandleFunc("/getNextEventID", auth.FBAuth(eventHandler.GetNextEventID)
 	// router.HandleFunc("/addScript", auth.FBAuth(allInOneHandler.AddScript))
 
 	// router.HandleFunc("/addTodo", auth.FBAuth(todoHandler.AddTodo))
 	// router.HandleFunc("/deleteTodo", auth.FBAuth(todoHandler.DeleteTodo))
 
 	// router.HandleFunc("/getTodosByUID", auth.FBAuth(todoHandler.GetTodosByUID))
-
 	fmt.Printf("Listening on port %d", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
+	c := cors.Default().Handler(router)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), c))
 }
 
 type AppHandler struct {
