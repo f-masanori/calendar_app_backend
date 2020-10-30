@@ -42,8 +42,8 @@ func (f *FirebaseAuth) FBAuth(next http.Handler) http.Handler {
 	//現在改善中
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		opt := option.WithCredentialsFile("/go/src/golang/calendarapp-dcbd5-firebase-adminsdk-9fhv7-acb24a0067.json")
-		// fmt.Print(opt)
+		opt := option.WithCredentialsFile(f.serviceAccountKeyPath)
+		fmt.Print(opt)
 		app, err := firebase.NewApp(context.Background(), nil, opt)
 		if err != nil {
 			fmt.Errorf("error initializing app: %v", err)

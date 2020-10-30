@@ -4,7 +4,7 @@ DOCKER_DNS:=db
 FLYWAY_CONF?=-url=jdbc:mysql://$(DOCKER_DNS):3306/$(DBNAME) -user=root -password=mysql
 
 export DATABASE_DATASOURCE:=root:mysql@tcp($(DOCKER_DNS):3306)/$(DBNAME)
-export GOOGLE_APPLICATION_CREDENTIALS=$(HOME)/.config/gcloud/calendar_service_account.json
+export GOOGLE_APPLICATION_CREDENTIALS=$(HOME)/.config/gcloud/calendarapp-dcbd5-firebase-adminsdk-9fhv7-acb24a0067.json
 
 dcu:
 	docker-compose up

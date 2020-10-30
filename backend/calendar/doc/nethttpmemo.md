@@ -48,3 +48,11 @@ func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
 ____
 
 構造体Serverのhandlerフィールドに値を指定してしまうと、きたリクエスト全てそのハンドラーに流れてしまう。
+
+
+///////////
+log.Fatalするとプロセスが死んじゃう
+func Fatal(v ...interface{}) {
+    std.Output(2, fmt.Sprint(v...))
+    os.Exit(1)
+}

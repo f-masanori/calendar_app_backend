@@ -42,7 +42,7 @@ func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) (int, in
 
 	}
 	log.Println(request)
-	// fmt.Println(r.Body)
+	fmt.Println(r.Body)
 	// fmt.Println(r.Method)
 	// uid := Authentication.FirebaseUID
 	e.Service.CreateEvent(Authentication.FirebaseUID, request.EventID, request.Date, request.InputEvent)

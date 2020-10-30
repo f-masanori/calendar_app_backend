@@ -33,7 +33,7 @@ func (repo *EventRepository) CreateEvent(UID string, eventID int, date string, e
 	result2, err2 := repo.SqlHandler.DB.Exec("UPDATE next_event_ids SET next_event_id = next_event_id+1 WHERE uid = ?", UID)
 	if err2 != nil {
 		log.Println("NextEevntID????? repo.SqlHandler.DB.Exec error")
-		log.Fatal(err2)
+		log.Print(err2)
 	}
 	fmt.Println(result2)
 	/*******/
@@ -45,10 +45,15 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 	// fmt.Println(UID)
 	rows, err := repo.SqlHandler.DB.Query("SELECT * from events WHERE uid = ?;", UID)
 	if err != nil {
-		log.Print("error executing database query: ", err)
+		log.Println("error executing database query: ", err)
 	}
-	defer rows.Close()
-
+	defer func() {
+		rows.Close()
+		fmt.Println("End func")
+		if err := recover(); err != nil {
+			fmt.Println("Runtime Error:", err)
+		}
+	}()
 	var events_table_colum Events_table
 	for rows.Next() {
 		var event entities.Event
@@ -65,7 +70,7 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 			&events_table_colum.UpdatedAt)
 		if err != nil {
 			fmt.Println(err)
-			panic(err.Error())
+			return nil, 0, err
 		}
 		event.ID = events_table_colum.ID
 		event.UID = events_table_colum.UID
@@ -82,8 +87,9 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 	/* NextEventID Read ?? */
 	var _NextEventID int
 	if err := repo.SqlHandler.DB.QueryRow("SELECT next_event_id FROM next_event_ids WHERE uid = ?", UID).Scan(&_NextEventID); err != nil {
-		log.Fatal("NextEventID Read ??")
-		log.Fatal(err)
+		log.Println("NextEventID Read ??")
+		log.Println(err)
+		return nil, 0, err
 	}
 	fmt.Println(_NextEventID)
 
@@ -119,8 +125,9 @@ func (repo *EventRepository) DeleteEvent(UID string, eventID int) {
 func (repo *EventRepository) GetNextEventID(UID string) int {
 	var _NextEventID int
 	if err := repo.SqlHandler.DB.QueryRow("SELECT next_event_id FROM next_event_ids WHERE uid = ?", UID).Scan(&_NextEventID); err != nil {
-		log.Fatal("NextEventID Read ??")
-		log.Fatal(err)
+		log.Println("NextEventID Read ??")
+		log.Print(err)
+		return 0
 	}
 	fmt.Println(_NextEventID)
 	return _NextEventID
@@ -136,7 +143,7 @@ func (repo *EventRepository) EditEvent(
 	statement := "UPDATE events set event = ?,background_color = ?,border_color = ?,text_color = ? where uid = ? and event_id = ? "
 	stmtInsert, err := repo.SqlHandler.DB.Prepare(statement)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	defer stmtInsert.Close()
 
