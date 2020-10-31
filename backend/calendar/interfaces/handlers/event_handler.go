@@ -8,6 +8,7 @@ import (
 	"golang/calendar/infrastructure/database"
 	sqlcmd "golang/calendar/interfaces/database"
 	"golang/calendar/services"
+	"golang/calendar/utils"
 	"log"
 	"net/http"
 )
@@ -29,7 +30,7 @@ func NewEventHandler(sqlHandler *database.SqlHandler) *EventHandler {
 func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	log.Println(" (e *EventHandler) AddEvent")
 	type Request struct {
-		EventID    int    `json:"EventID"`
+		EventID    string `json:"EventID"`
 		Date       string `json:"Date"`
 		InputEvent string `json:"InputEvent"`
 	}
@@ -39,13 +40,12 @@ func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) (int, in
 	if err != nil {
 		panic(err)
 		return 400, nil, err
-
 	}
-	log.Println(request)
+	log.Println(request.EventID)
 	fmt.Println(r.Body)
 	// fmt.Println(r.Method)
 	// uid := Authentication.FirebaseUID
-	e.Service.CreateEvent(Authentication.FirebaseUID, request.EventID, request.Date, request.InputEvent)
+	e.Service.CreateEvent(Authentication.FirebaseUID, utils.StrToInt(request.EventID), request.Date, request.InputEvent)
 	return 200, nil, nil
 }
 func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {

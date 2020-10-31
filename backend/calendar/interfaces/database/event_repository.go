@@ -12,8 +12,6 @@ type EventRepository struct {
 }
 
 func (repo *EventRepository) CreateEvent(UID string, eventID int, date string, event string) {
-	/* Event?Create?? */
-	fmt.Println("Event?Create process")
 	statement := "INSERT INTO events(uid,event_id,date,event,background_color,border_color,text_color) VALUES(?,?,?,?,?,?,?)"
 	stmtInsert, err := repo.SqlHandler.DB.Prepare(statement)
 	if err != nil {
@@ -49,10 +47,6 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 	}
 	defer func() {
 		rows.Close()
-		fmt.Println("End func")
-		if err := recover(); err != nil {
-			fmt.Println("Runtime Error:", err)
-		}
 	}()
 	var events_table_colum Events_table
 	for rows.Next() {
@@ -82,6 +76,8 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 		event.TextColor = events_table_colum.TextColor
 		events = append(events, event)
 	}
+	fmt.Println(events)
+
 	/**************/
 
 	/* NextEventID Read ?? */
@@ -91,7 +87,7 @@ func (repo *EventRepository) GetEventsByUID(UID string) (entities.Events, int, e
 		log.Println(err)
 		return nil, 0, err
 	}
-	fmt.Println(_NextEventID)
+	fmt.Println(events)
 
 	return events, _NextEventID, nil
 }

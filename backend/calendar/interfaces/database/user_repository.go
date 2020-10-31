@@ -15,6 +15,24 @@ type UserRepository struct {
 	SqlHandler *database.SqlHandler
 }
 
+func (repo *UserRepository) CreateNextEventID(UID string) (int, error) {
+	/* NextEventID Create Process */
+	statement2 := "INSERT INTO next_event_ids(uid,next_event_id) VALUES(?,?)"
+	stmtInsert2, err := repo.SqlHandler.DB.Prepare(statement2)
+	if err != nil {
+		fmt.Println("NextEventID Create Process error")
+		return 0, err
+	}
+	defer stmtInsert2.Close()
+	res2, err := stmtInsert2.Exec(UID, 1)
+	if err != nil {
+		fmt.Println("error2")
+		fmt.Println(res2)
+		return 0, err
+	}
+	fmt.Println("success create next event ID record")
+	return 1, nil
+}
 func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User, error) {
 	/* User Create process*/
 	var user entities.User
@@ -36,21 +54,6 @@ func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User,
 	user.UID = "uid"
 	/* */
 
-	/* NextEventID Create Process */
-	statement2 := "INSERT INTO next_event_ids(uid,next_event_id) VALUES(?,?)"
-	stmtInsert2, err := repo.SqlHandler.DB.Prepare(statement2)
-	if err != nil {
-		fmt.Println("NextEventID Create Process error")
-		return user, err
-	}
-	defer stmtInsert2.Close()
-	res2, err := stmtInsert2.Exec(UID, 1)
-	if err != nil {
-		fmt.Println("error2")
-		fmt.Println(res2)
-		return user, err
-	}
-
 	/* NextTodoID Create Process */
 	statement3 := "INSERT INTO next_todo_ids(uid,next_todo_id) VALUES(?,?)"
 	stmtInsert3, err := repo.SqlHandler.DB.Prepare(statement3)
@@ -58,7 +61,7 @@ func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User,
 		fmt.Println("NextTodoID Create Process error")
 		return user, err
 	}
-	defer stmtInsert2.Close()
+	defer stmtInsert3.Close()
 	res3, err := stmtInsert3.Exec(UID, 1)
 	if err != nil {
 		fmt.Println("error3")

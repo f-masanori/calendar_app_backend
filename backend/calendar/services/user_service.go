@@ -12,9 +12,7 @@ type UserRepository interface {
 	FindAll() (entities.Users, error)
 	CreateUser(string, string) (entities.User, error)
 	DeleteUser(int) (int, error)
-	// Find(int) (entities.User, error)
-	// Save(*entities.User) (entities.User, error)
-	// Update(int, *entities.User) (entities.User, error)
+	CreateNextEventID(string) (int, error)
 }
 type UserService struct {
 	UserRepository UserRepository
@@ -22,13 +20,18 @@ type UserService struct {
 
 func (s *UserService) StoreNewUser(UID string, Email string) (entities.User, error) {
 	fmt.Println("StoreNewUser")
+	fmt.Println(UID, Email)
 	user, err := s.UserRepository.CreateUser(UID, Email)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Println("Created New user ID=" + strconv.Itoa(user.ID) + " name=" + user.Name)
 	}
-	return user, err
+	_, err2 := s.UserRepository.CreateNextEventID(UID)
+	if err2 != nil {
+		fmt.Println(err2)
+	}
+	return user, nil
 }
 
 /****/
