@@ -16,57 +16,55 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) CreateNextEventID(UID string) (int, error) {
-	/* NextEventID Create Process */
-	statement2 := "INSERT INTO next_event_ids(uid,next_event_id) VALUES(?,?)"
-	stmtInsert2, err := repo.SqlHandler.DB.Prepare(statement2)
-	if err != nil {
-		fmt.Println("NextEventID Create Process error")
-		return 0, err
+	statement := "INSERT INTO next_event_ids(uid,next_event_id) VALUES(?,?)"
+	stmtInsert, PrepareErr := repo.SqlHandler.DB.Prepare(statement)
+	if PrepareErr != nil {
+		fmt.Println(PrepareErr)
+		return 0, PrepareErr
 	}
-	defer stmtInsert2.Close()
-	res2, err := stmtInsert2.Exec(UID, 1)
-	if err != nil {
-		fmt.Println("error2")
-		fmt.Println(res2)
-		return 0, err
+	defer stmtInsert.Close()
+	_, ExecErr := stmtInsert.Exec(UID, 1)
+	if ExecErr != nil {
+		fmt.Println(ExecErr)
+		return 0, ExecErr
 	}
-	fmt.Println("success create next event ID record")
 	return 1, nil
 }
 func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User, error) {
-	/* User Create process*/
 	var user entities.User
 	statement := "INSERT INTO users(uid,email) VALUES(?,?)"
-	stmtInsert, err := repo.SqlHandler.DB.Prepare(statement)
-	if err != nil {
-		fmt.Println("User Create process error")
-		return user, err
+	stmtInsert, PrepareErr := repo.SqlHandler.DB.Prepare(statement)
+	if PrepareErr != nil {
+		log.Println(PrepareErr)
+		return user, PrepareErr
 	}
 	defer stmtInsert.Close()
-	result, err := stmtInsert.Exec(UID, Email)
-	if err != nil {
-		fmt.Println("error2")
-		return user, err
+	result, ExecErr := stmtInsert.Exec(UID, Email)
+	if ExecErr != nil {
+		log.Println(ExecErr)
+		return user, ExecErr
 	}
-	lastInsertID, err := result.LastInsertId()
+	lastInsertID, LastInsertIDErr := result.LastInsertId()
+	if LastInsertIDErr != nil {
+		log.Println(LastInsertIDErr)
+		return user, LastInsertIDErr
+	}
 	user.ID = int(lastInsertID)
 	user.Name = "name"
 	user.UID = "uid"
-	/* */
 
 	/* NextTodoID Create Process */
-	statement3 := "INSERT INTO next_todo_ids(uid,next_todo_id) VALUES(?,?)"
-	stmtInsert3, err := repo.SqlHandler.DB.Prepare(statement3)
-	if err != nil {
-		fmt.Println("NextTodoID Create Process error")
-		return user, err
+	statement2 := "INSERT INTO next_todo_ids(uid,next_todo_id) VALUES(?,?)"
+	stmtInsert2, NextTodoIDPrepareErr := repo.SqlHandler.DB.Prepare(statement2)
+	if NextTodoIDPrepareErr != nil {
+		log.Println(NextTodoIDPrepareErr)
+		return user, NextTodoIDPrepareErr
 	}
-	defer stmtInsert3.Close()
-	res3, err := stmtInsert3.Exec(UID, 1)
-	if err != nil {
-		fmt.Println("error3")
-		fmt.Println(res3)
-		return user, err
+	defer stmtInsert2.Close()
+	_, ExecErr2 := stmtInsert2.Exec(UID, 1)
+	if ExecErr2 != nil {
+		log.Println(ExecErr2)
+		return user, ExecErr2
 	}
 
 	return user, nil
@@ -74,27 +72,18 @@ func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User,
 
 func (repo *UserRepository) FindAll() (entities.Users, error) {
 	var users entities.Users
-
-	fmt.Println("show users")
-	rows, err := repo.SqlHandler.DB.Query("SELECT * from users;")
-	if err != nil {
-		log.Print("error executing database query: ", err)
+	rows, QueryErr := repo.SqlHandler.DB.Query("SELECT * from users;")
+	if QueryErr != nil {
+		log.Println(QueryErr)
 	}
 	defer rows.Close() // make sure rows is closed when the handler exits
-	defer fmt.Println("どこで終了かの確認")
-	// type users_table struct {
-	// 	IS         int    `db:"id"`
-	// 	Name       string `db:"name"`
-	// 	CreatedAt string `db:"CreatedAt"`
-	// 	UpdatedAt string `db:"updated_at"`
-	// }
 	var users_table_colum Users_table
 	for rows.Next() {
 		var user entities.User
-		err := rows.Scan(&users_table_colum.ID, &users_table_colum.Name, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt)
-		if err != nil {
-			fmt.Println(err)
-			panic(err.Error())
+
+		if err := rows.Scan(&users_table_colum.ID, &users_table_colum.Name, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt); err != nil {
+			log.Println(err)
+			return nil, err
 		}
 		user.ID = users_table_colum.ID
 		user.Name = users_table_colum.Name
@@ -105,12 +94,12 @@ func (repo *UserRepository) FindAll() (entities.Users, error) {
 }
 
 func (repo *UserRepository) DeleteUser(id int) (int, error) {
-	//トランザクションを使用する
-	tx, err := repo.SqlHandler.DB.Begin() // トランザクションを開始
+	// ここでTransaction処理をするのはおかしい。servicesで行う
+
+	tx, err := repo.SqlHandler.DB.Begin()
 	if err != nil {
 		return 0, err
 	}
-	// Transactionのための関数
 	trans := func(tx *sql.Tx) (int64, error) {
 		stmt1, _ := tx.Prepare("DELETE FROM users WHERE id = ?")
 		result, err := stmt1.Exec(id)
@@ -142,7 +131,6 @@ func (repo *UserRepository) DeleteUser(id int) (int, error) {
 		fmt.Println("DBエラー")
 		fmt.Println("_rowsAffect" + strconv.Itoa(rowsAffect))
 	}
-	// Commit
 	tx.Commit()
 	return id, nil
 }

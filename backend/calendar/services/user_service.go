@@ -5,7 +5,6 @@ import (
 	"golang/calendar/entities"
 	"golang/calendar/infrastructure/database"
 	sqlcmd "golang/calendar/interfaces/database"
-	"strconv"
 )
 
 type UserRepository interface {
@@ -19,22 +18,41 @@ type UserService struct {
 }
 
 func (s *UserService) StoreNewUser(UID string, Email string) (entities.User, error) {
-	fmt.Println("StoreNewUser")
-	fmt.Println(UID, Email)
+	//　トランザクション処理を実装する
 	user, err := s.UserRepository.CreateUser(UID, Email)
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		fmt.Println("Created New user ID=" + strconv.Itoa(user.ID) + " name=" + user.Name)
+		u := entities.User{}
+		// ここはもっとスマートな方法がないのか？
+		return u, err
 	}
-	_, err2 := s.UserRepository.CreateNextEventID(UID)
-	if err2 != nil {
-		fmt.Println(err2)
+	_, RepErr := s.UserRepository.CreateNextEventID(UID)
+	if RepErr != nil {
+		fmt.Println(RepErr)
+		u := entities.User{}
+		return u, RepErr
+
 	}
 	return user, nil
 }
+func (s *UserService) GetAll() (entities.Users, error) {
+	users, RepErr := s.UserRepository.FindAll()
+	if RepErr != nil {
+		fmt.Println(RepErr)
+		u := entities.Users{}
+		return u, RepErr
+	}
+	return users, nil
+}
 
-/****/
+func (s *UserService) DeleteUser(ID int) (int, error) {
+	returnId, RepErr := s.UserRepository.DeleteUser(ID)
+	if RepErr != nil {
+		fmt.Println(RepErr)
+		return -1, RepErr
+	}
+	return returnId, nil
+}
 
 /* for test */
 func NewUserService(sqlHandler *database.SqlHandler) *UserService {
@@ -43,19 +61,4 @@ func NewUserService(sqlHandler *database.SqlHandler) *UserService {
 			SqlHandler: sqlHandler,
 		},
 	}
-}
-
-/* ******** */
-
-// Index
-func (s *UserService) GetAll() (entities.Users, error) {
-	users, err := s.UserRepository.FindAll()
-	return users, err
-}
-
-func (s *UserService) DeleteUser(ID int) int {
-	fmt.Println("DeleteUser")
-	returnId, err := s.UserRepository.DeleteUser(ID)
-	fmt.Println(err)
-	return returnId
 }

@@ -30,11 +30,11 @@ func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) (int, inte
 	}
 	decoder := json.NewDecoder(r.Body)
 	request := new(Request)
-	err := decoder.Decode(&request)
-	if err != nil {
-		panic(err)
+
+	if DecodeErr := decoder.Decode(&request); DecodeErr != nil {
+		log.Println(DecodeErr)
+		return 500, nil, DecodeErr
 	}
-	log.Println(request)
 
 	user, err := h.Service.StoreNewUser(request.UID, request.Email)
 	if err != nil {
