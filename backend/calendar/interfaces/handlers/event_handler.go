@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"golang/calendar/entities"
 	Authentication "golang/calendar/infrastructure"
 	"golang/calendar/infrastructure/database"
@@ -28,7 +27,6 @@ func NewEventHandler(sqlHandler *database.SqlHandler) *EventHandler {
 }
 
 func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-	log.Println(" (e *EventHandler) AddEvent")
 	type Request struct {
 		EventID    string `json:"EventID"`
 		Date       string `json:"Date"`
@@ -36,60 +34,54 @@ func (e *EventHandler) AddEvent(w http.ResponseWriter, r *http.Request) (int, in
 	}
 	decoder := json.NewDecoder(r.Body)
 	request := new(Request)
-	err := decoder.Decode(&request)
-	if err != nil {
-		panic(err)
-		return 400, nil, err
+	if DecodeErr := decoder.Decode(&request); DecodeErr != nil {
+		return 500, nil, DecodeErr
 	}
-	log.Println(request.EventID)
-	fmt.Println(r.Body)
-	// fmt.Println(r.Method)
-	// uid := Authentication.FirebaseUID
-	e.Service.CreateEvent(Authentication.FirebaseUID, utils.StrToInt(request.EventID), request.Date, request.InputEvent)
+	if ServicesErr := e.Service.CreateEvent(Authentication.FirebaseUID, utils.StrToInt(request.EventID), request.Date, request.InputEvent); ServicesErr != nil {
+		return 500, nil, ServicesErr
+	}
 	return 200, nil, nil
 }
 func (e *EventHandler) GetEventsByUID(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-
 	type Response struct {
 		Events      entities.Events `json:"Events"`
 		NextEventID int             `json:"NextEventID"`
 	}
-	Events, NextEventID := e.Service.GetEventsByUID(Authentication.FirebaseUID)
-	fmt.Println(Events)
+	Events, NextEventID, err := e.Service.GetEventsByUID(Authentication.FirebaseUID)
+	if err != nil {
+		return 500, nil, err
+	}
 	_Response := Response{Events: Events, NextEventID: NextEventID}
 
 	return 200, _Response, nil
 }
 func (e *EventHandler) DeleteEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-	log.Println(" (e *EventHandler) DeleteEvent")
 	type Request struct {
 		EventID int `json:"EventID,string"`
 	}
 	decoder := json.NewDecoder(r.Body)
-	// fmt.Println(decoder)
 	request := new(Request)
 	err := decoder.Decode(&request)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return 500, nil, err
 	}
-	log.Println(request)
-	// fmt.Println(r.Body)
-	// fmt.Println(r.Method)
-	// uid := Authentication.FirebaseUID
 	e.Service.DeleteEvent(Authentication.FirebaseUID, request.EventID)
 	return 200, nil, nil
 }
 func (e *EventHandler) GetNextEventID(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-	log.Println(" (e *EventHandler) GetNextEventID")
-	NextEventID := e.Service.GetNextEventID(Authentication.FirebaseUID)
+	NextEventID, err := e.Service.GetNextEventID(Authentication.FirebaseUID)
+	if err != nil {
+		log.Println(err)
+		return 500, nil, err
+	}
 	type Response struct {
 		NextEventID int `json:"NextEventID"`
 	}
-	fmt.Println(NextEventID)
 	_Response := Response{NextEventID: NextEventID}
 	return 200, _Response, nil
 }
-func (e *EventHandler) EditEvent(w http.ResponseWriter, r *http.Request) {
+func (e *EventHandler) EditEvent(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	type Request struct {
 		EventID int `json:"EventID,string"`
 		// Date       string `json:"Date"`
@@ -99,20 +91,19 @@ func (e *EventHandler) EditEvent(w http.ResponseWriter, r *http.Request) {
 		TextColor       string `json:"TextColor"`
 	}
 	decoder := json.NewDecoder(r.Body)
-	// fmt.Println(decoder)
 	request := new(Request)
-	err := decoder.Decode(&request)
-	if err != nil {
-		panic(err)
+	if err := decoder.Decode(&request); err != nil {
+		log.Println(err)
+		return 500, nil, err
 	}
-	log.Println(request)
-
-	e.Service.EditEvent(
+	if err := e.Service.EditEvent(
 		Authentication.FirebaseUID,
 		request.EventID,
 		request.InputEvent,
 		request.BackgroundColor,
 		request.BorderColor,
-		request.TextColor)
-
+		request.TextColor); err != nil {
+		return 500, nil, err
+	}
+	return 200, nil, nil
 }

@@ -1,16 +1,16 @@
 package services
 
 import (
-	"fmt"
 	"golang/calendar/entities"
+	"log"
 )
 
 type EventRepository interface {
-	CreateEvent(string, int, string, string)
+	CreateEvent(string, int, string, string) error
 	GetEventsByUID(string) (entities.Events, int, error)
-	DeleteEvent(string, int)
-	GetNextEventID(string) int
-	EditEvent(string, int, string, string, string, string)
+	DeleteEvent(string, int) error
+	GetNextEventID(string) (int, error)
+	EditEvent(string, int, string, string, string, string) error
 }
 
 /*
@@ -21,29 +21,39 @@ type EventService struct {
 	EventRepository EventRepository
 }
 
-func (e *EventService) CreateEvent(uid string, eventID int, date string, event string) {
+func (e *EventService) CreateEvent(uid string, eventID int, date string, event string) error {
 	/* Event作成時にNextEventIDを更新する必要あり
 	Event作成時には必ず必要な動作なのでe.EventRepository.CreateEventに
 	入れ込む(トランザクション処理も可能になるため) */
-	e.EventRepository.CreateEvent(uid, eventID, date, event)
-
+	err := e.EventRepository.CreateEvent(uid, eventID, date, event)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
-func (e *EventService) GetEventsByUID(uid string) (entities.Events, int) {
+func (e *EventService) GetEventsByUID(uid string) (entities.Events, int, error) {
 	events, nextEventID, err := e.EventRepository.GetEventsByUID(uid)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		return nil, 0, err
 	}
-	fmt.Print("events, nextEventID : ")
-	fmt.Println(events, nextEventID)
-	return events, nextEventID
+	return events, nextEventID, nil
 
 }
-func (e *EventService) DeleteEvent(UID string, eventID int) {
-	e.EventRepository.DeleteEvent(UID, eventID)
+func (e *EventService) DeleteEvent(UID string, eventID int) error {
+	err := e.EventRepository.DeleteEvent(UID, eventID)
+	if err != nil {
+		return err
+	}
+	return nil
 }
-func (e *EventService) GetNextEventID(UID string) int {
-	NextEventID := e.EventRepository.GetNextEventID(UID)
-	return NextEventID
+func (e *EventService) GetNextEventID(UID string) (int, error) {
+	NextEventID, err := e.EventRepository.GetNextEventID(UID)
+	if err != nil {
+		return -1, err
+	}
+	return NextEventID, nil
 }
 func (e *EventService) EditEvent(
 	UID string,
@@ -51,6 +61,10 @@ func (e *EventService) EditEvent(
 	InputEvent string,
 	BackgroundColor string,
 	BorderColor string,
-	TextColor string) {
-	e.EventRepository.EditEvent(UID, EventID, InputEvent, BackgroundColor, BorderColor, TextColor)
+	TextColor string) error {
+	err := e.EventRepository.EditEvent(UID, EventID, InputEvent, BackgroundColor, BorderColor, TextColor)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -54,6 +54,10 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	router.Methods(http.MethodPost, http.MethodOptions).Path("/event").Handler(authChain.Then(AppHandler{eventHandler.AddEvent}))
 	router.Methods(http.MethodGet, http.MethodOptions).Path("/event/nextID").Handler(authChain.Then(AppHandler{eventHandler.GetNextEventID}))
 
+	router.Methods(http.MethodPatch, http.MethodOptions).Path("/event/{id}").Handler(authChain.Then(AppHandler{eventHandler.EditEvent}))
+
+	// router.HandleFunc("/getNextEventID", auth.FBAuth(eventHandler.GetNextEventID)
+
 	// router.HandleFunc("/addEvent", auth.FBAuth(eventHandler.AddEvent))
 	// router.HandleFunc("/getEventsByUID", auth.FBAuth(eventHandler.GetEventsByUID))
 	// router.HandleFunc("/registerUser", userHandler.NewUser)
