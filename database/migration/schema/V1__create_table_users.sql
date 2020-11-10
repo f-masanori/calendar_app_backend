@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS users (
     primary key (id)
 );
 
-INSERT INTO users (id, uid, email, name) VALUES (1, "0123456789", "test1@test.com", "test user 1");
+INSERT INTO users (id, uid, email, name) VALUES (1, "0123456789", "test1@test.com", "testuser1");

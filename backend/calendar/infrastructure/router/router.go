@@ -44,9 +44,8 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	userHandler := handlers.NewUserHandler(DBhandler)
 	eventHandler := handlers.NewEventHandler(DBhandler)
 	// todoHandler := handlers.NewTodoHandler(DBhandler)
-	/* REST APIに変更中 */
-	// fmt.Println("Listening on d")
 
+	/* REST APIに変更中 */
 	router.Methods(http.MethodGet, http.MethodOptions).Path("/event").Handler(authChain.Then(AppHandler{eventHandler.GetEventsByUID}))
 	router.Methods(http.MethodPost, http.MethodOptions).Path("/user").Handler(commonChain.Then(AppHandler{userHandler.NewUser}))
 	router.Methods(http.MethodGet, http.MethodOptions).Path("/user/{id}").Handler(authChain.Then(AppHandler{eventHandler.GetEventsByUID}))
@@ -57,7 +56,6 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	router.Methods(http.MethodPatch, http.MethodOptions).Path("/event/{id}").Handler(authChain.Then(AppHandler{eventHandler.EditEvent}))
 
 	// router.HandleFunc("/getNextEventID", auth.FBAuth(eventHandler.GetNextEventID)
-
 	// router.HandleFunc("/addEvent", auth.FBAuth(eventHandler.AddEvent))
 	// router.HandleFunc("/getEventsByUID", auth.FBAuth(eventHandler.GetEventsByUID))
 	// router.HandleFunc("/registerUser", userHandler.NewUser)
@@ -65,11 +63,10 @@ func Run(datasource string, serviceAccountKeyPath string, port int) {
 	// router.HandleFunc("/editEvent", auth.FBAuth(eventHandler.EditEvent))
 	// router.HandleFunc("/getNextEventID", auth.FBAuth(eventHandler.GetNextEventID)
 	// router.HandleFunc("/addScript", auth.FBAuth(allInOneHandler.AddScript))
-
 	// router.HandleFunc("/addTodo", auth.FBAuth(todoHandler.AddTodo))
 	// router.HandleFunc("/deleteTodo", auth.FBAuth(todoHandler.DeleteTodo))
-
 	// router.HandleFunc("/getTodosByUID", auth.FBAuth(todoHandler.GetTodosByUID))
+
 	fmt.Printf("Listening on port %d", port)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), router))
@@ -82,7 +79,6 @@ type AppHandler struct {
 func (a AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	status, res, err := a.h(w, r)
 	if err != nil {
 		httputil.RespondErrorJson(w, status, err)

@@ -12,21 +12,12 @@ type Database_ struct {
 
 var Database Database_
 
-func Init() {
-	Database.Drivername = "mysql"
-	Database.Host = "mysql_container"
-	Database.Port = "3306"
-	Database.User = "root"
-	Database.Password = "mysql"
-	Database.Dbname = "app"
-}
-
 func Test() {
 	Database.Drivername = "mysql"
-	Database.Host = "mysql_container"
+	Database.Host = "calendar-app-db"
 	Database.Port = "3306"
 	Database.User = "root"
 	Database.Password = "mysql"
-	Database.Dbname = "app"
+	Database.Dbname = "calendar_app"
 
 }

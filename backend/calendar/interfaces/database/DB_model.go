@@ -2,6 +2,8 @@ package database
 
 type Users_table struct {
 	ID        int    `db:"id"`
+	UID       string `db:"uid"`
+	Email     string `db:"email"`
 	Name      string `db:"name"`
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`

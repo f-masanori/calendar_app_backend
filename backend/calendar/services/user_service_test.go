@@ -1,8 +1,8 @@
 package services
 
 import (
-	"golang/calendar/conf"
 	"golang/calendar/infrastructure/database"
+	"golang/conf"
 	"reflect"
 	"testing"
 
@@ -14,9 +14,9 @@ func TestGetAllSuccess(t *testing.T) {
 
 	conf.Test()
 	DBhandler := database.TestNewSqlHandler()
-	NewUserService := NewUserService(DBhandler)
+	UserService := NewUserService(DBhandler)
 
-	users, err := NewUserService.GetAll()
+	users, err := UserService.GetAll()
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -30,12 +30,29 @@ func TestGetAllSuccess(t *testing.T) {
 
 }
 
-// func TestStoreNewUserSuccess(t *testing.T) {
-// 	conf.Init()
-// 	DBhandler := database.NewSqlHandler()
-// 	rows, err := DBhandler.DB.Query("SELECT * from users;")
-// 	fmt.Println(rows)
-// 	if err !=nil{
-// 		t.Fatalf("failed test %#v", err)
-// 	}
-// }
+func TestStoreNewUserSuccess(t *testing.T) {
+
+	conf.Test()
+	DBhandler := database.TestNewSqlHandler()
+	UserService := NewUserService(DBhandler)
+
+	newUser, StoreNewUserErr := UserService.StoreNewUser("testUID", "test@com")
+	if StoreNewUserErr != nil {
+		t.Fatalf("failed test %#v", StoreNewUserErr)
+	}
+
+	expectedUID := "testUID"
+	autualUID := newUser.UID
+	// userID := newUser.ID
+	// returnedID, DeleteUserErr := UserService.DeleteUser(userID)
+	// if DeleteUserErr != nil {
+	// 	t.Fatalf("failed test %#v", DeleteUserErr)
+	// }
+
+	if autualUID != expectedUID {
+		t.Fatalf("failed test %#v", "user_seivece :StoreNewUser - UID返り値型エラー")
+	}
+	// if returnedID != userID {
+	// 	t.Fatalf("failed test %#v", "user_seivece :DeleteUser - UID返り値型エラー")
+	// }
+}

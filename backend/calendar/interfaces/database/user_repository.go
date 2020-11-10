@@ -76,17 +76,19 @@ func (repo *UserRepository) FindAll() (entities.Users, error) {
 	if QueryErr != nil {
 		log.Println(QueryErr)
 	}
-	defer rows.Close() // make sure rows is closed when the handler exits
+	defer rows.Close()
 	var users_table_colum Users_table
 	for rows.Next() {
 		var user entities.User
 
-		if err := rows.Scan(&users_table_colum.ID, &users_table_colum.Name, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt); err != nil {
+		if err := rows.Scan(&users_table_colum.ID, &users_table_colum.UID, &users_table_colum.Name, &users_table_colum.Email, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt); err != nil {
 			log.Println(err)
 			return nil, err
 		}
 		user.ID = users_table_colum.ID
+		user.UID = users_table_colum.UID
 		user.Name = users_table_colum.Name
+
 		users = append(users, user)
 	}
 

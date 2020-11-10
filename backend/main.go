@@ -3,14 +3,10 @@ package main
 import (
 	"flag"
 	"golang/calendar/infrastructure/router"
-	"golang/conf"
 	"log"
 	"os"
 )
 
-func init() {
-	conf.Init()
-}
 func main() {
 	var databaseDatasource string
 	var serviceAccountKeyPath string

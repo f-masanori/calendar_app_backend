@@ -35,3 +35,10 @@ flyway/repair:
 
 flyway/baseline:
 	docker-compose run --rm $(MIGRATION_SERVICE) $(FLYWAY_CONF) baseline
+
+APP_SERVICE:=backend-api
+app/user_service_TestGetAllSuccess_test:
+	docker-compose exec $(APP_SERVICE) go test -v -run TestGetAllSuccess /usr/local/go/src/app/calendar/services
+
+app/user_service_TestStoreNewUserSuccess_test:
+	docker-compose exec $(APP_SERVICE) go test -v -run TestStoreNewUserSuccess /usr/local/go/src/app/calendar/services

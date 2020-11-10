@@ -3,7 +3,6 @@
 サマーインターンを終えて、以前作成したカレンダーアプリのバックエンド(apiサーバー)に修正したい部分がたくさん見つかったので、学習を兼ねて改善したいと思ってはじめました。
 
 修正前→(https://github.com/f-masanori/calendar_app)
-readmeが汚いです
 
 ### 目的
 
@@ -30,28 +29,39 @@ readmeが汚いです
 
 ### セットアップ
 
-1. Makefile内の`GOOGLE_APPLICATION_CREDENTIALS=$(HOME)/.config/gcloud/calendar_service_account.json`を自身のfirebase プロジェクトのjsonファイルのパスに書き換える
+1. ソースコードのルートディレクトリにあるMakefile内の`GOOGLE_APPLICATION_CREDENTIALS=$(HOME)/.config/gcloud/calendar_service_account.json`を自身のfirebase プロジェクトのjsonファイルのパスに書き換える
 
 2. `make dcu`で実行。(docker-comopose コマンドで立ち上げると、設定が読み込めずエラーになります。)
 
-
+3. `make mysql/init`でこのアプリで使うDB作成
+4. `make flyway/migrate`でマイグレーション実行
 
 ### 前回からの改善点[改善予定のものも含む]
 
 1. reflexを導入して開発の効率を上げた
 2. サマーインターン先でのMakefile文化を真似して、MakefileにDB接続先情報やfirebase設定情報を書いた（設定情報がプロジェクトのルートに来るので読みやすくなった）
-3. ミドルウェアをライブラリaliceを使ってまとめて、可読性アップ
+3. ミドルウェアをalice(ライブラリ)を使ってまとめて、可読性アップ
 4. プレゼンテーター機能をinterface層に記述していたのを、infrastructure層に移動して、責務の分散する(これによって拡張性が増加)[改善予定]
 5. マイグレーション機能を一つのコンテナとして独立させる。[改善予定]（前回はカレンダーアプリの中でマイグレーションするようにしていたが、毎回コンテナの中に入って実行するのが面倒だった。）
-6. Rest API化する。[改善中]（（規則を作ることで可読性アップ）
+6. Rest API化する。[改善中]（規則を作ることで可読性アップ）
 7. テストコードの書き方を練習するためテストを増やす。[改善予定]（現在一個しか書いてない）
 
 ### 困っている・悩んでいること
 1. エラーハンドリングの実装(どこをpanicにして、どこをlogに残すべきかとか。そもそもエラーハンドリングの知識がたりてない)
-2. トランザクション処理をservicesで綺麗に実装する
+2. トランザクション処理をservicesで実装すべきなのか。（servicesにトランザクションを書いたらservicesがDBに依存するのではないか？）
 
 ### 一番ハマった部分
 CORSに対応する実装部分
+
+### テスト
+
+- servicesのテスト実行
+
+`make app/user_service_TestGetAllSuccess_test`
+
+`make app/user_service_TestStoreNewUserSuccess_test`
+
+
 
 ###  クリーンアーキテクチャを使用したことについて
 

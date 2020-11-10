@@ -30,7 +30,6 @@ func (h *UserHandler) NewUser(w http.ResponseWriter, r *http.Request) (int, inte
 	}
 	decoder := json.NewDecoder(r.Body)
 	request := new(Request)
-
 	if DecodeErr := decoder.Decode(&request); DecodeErr != nil {
 		log.Println(DecodeErr)
 		return 500, nil, DecodeErr
