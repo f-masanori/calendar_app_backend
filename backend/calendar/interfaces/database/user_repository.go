@@ -30,16 +30,16 @@ func (repo *UserRepository) CreateNextEventID(UID string) (int, error) {
 	}
 	return 1, nil
 }
-func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User, error) {
+func (repo *UserRepository) CreateUser(UID string, Email string, Name string) (entities.User, error) {
 	var user entities.User
-	statement := "INSERT INTO users(uid,email) VALUES(?,?)"
+	statement := "INSERT INTO users(uid,email,name) VALUES(?,?,?)"
 	stmtInsert, PrepareErr := repo.SqlHandler.DB.Prepare(statement)
 	if PrepareErr != nil {
 		log.Println(PrepareErr)
 		return user, PrepareErr
 	}
 	defer stmtInsert.Close()
-	result, ExecErr := stmtInsert.Exec(UID, Email)
+	result, ExecErr := stmtInsert.Exec(UID, Email, Name)
 	if ExecErr != nil {
 		log.Println(ExecErr)
 		return user, ExecErr
@@ -50,8 +50,8 @@ func (repo *UserRepository) CreateUser(UID string, Email string) (entities.User,
 		return user, LastInsertIDErr
 	}
 	user.ID = int(lastInsertID)
-	user.Name = "name"
-	user.UID = "uid"
+	user.UID = UID
+	user.Name = Name
 
 	/* NextTodoID Create Process */
 	statement2 := "INSERT INTO next_todo_ids(uid,next_todo_id) VALUES(?,?)"
@@ -81,7 +81,7 @@ func (repo *UserRepository) FindAll() (entities.Users, error) {
 	for rows.Next() {
 		var user entities.User
 
-		if err := rows.Scan(&users_table_colum.ID, &users_table_colum.UID, &users_table_colum.Name, &users_table_colum.Email, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt); err != nil {
+		if err := rows.Scan(&users_table_colum.ID, &users_table_colum.UID, &users_table_colum.Email, &users_table_colum.Name, &users_table_colum.CreatedAt, &users_table_colum.UpdatedAt); err != nil {
 			log.Println(err)
 			return nil, err
 		}
@@ -102,6 +102,7 @@ func (repo *UserRepository) DeleteUser(id int) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	trans := func(tx *sql.Tx) (int64, error) {
 		stmt1, _ := tx.Prepare("DELETE FROM users WHERE id = ?")
 		result, err := stmt1.Exec(id)
@@ -110,11 +111,11 @@ func (repo *UserRepository) DeleteUser(id int) (int, error) {
 		}
 		rowsAffect_int64, err := result.RowsAffected()
 
-		stmt2, _ := tx.Prepare("DELETE FROM user WHERE user_id = ?")
-		_, err = stmt2.Exec(id)
-		if err != nil {
-			return -1, err
-		}
+		// stmt2, _ := tx.Prepare("DELETE FROM events WHERE user_id = ?")
+		// _, err = stmt2.Exec(id)
+		// if err != nil {
+		// 	return -1, err
+		// }
 		return rowsAffect_int64, nil
 	}
 
@@ -133,6 +134,7 @@ func (repo *UserRepository) DeleteUser(id int) (int, error) {
 		fmt.Println("DBエラー")
 		fmt.Println("_rowsAffect" + strconv.Itoa(rowsAffect))
 	}
+
 	tx.Commit()
 	return id, nil
 }

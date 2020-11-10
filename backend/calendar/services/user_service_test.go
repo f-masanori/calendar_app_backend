@@ -43,16 +43,16 @@ func TestStoreNewUserSuccess(t *testing.T) {
 
 	expectedUID := "testUID"
 	autualUID := newUser.UID
-	// userID := newUser.ID
-	// returnedID, DeleteUserErr := UserService.DeleteUser(userID)
-	// if DeleteUserErr != nil {
-	// 	t.Fatalf("failed test %#v", DeleteUserErr)
-	// }
+	userID := newUser.ID
+	returnedID, DeleteUserErr := UserService.DeleteUser(userID)
+	if DeleteUserErr != nil {
+		t.Fatalf("failed test %#v", DeleteUserErr)
+	}
 
 	if autualUID != expectedUID {
-		t.Fatalf("failed test %#v", "user_seivece :StoreNewUser - UID返り値型エラー")
+		t.Fatalf("failed test %#v \n expected UID: %#v \n actual UID: %#v", "user_seivece :StoreNewUser - UID返り値型エラー", expectedUID, autualUID)
 	}
-	// if returnedID != userID {
-	// 	t.Fatalf("failed test %#v", "user_seivece :DeleteUser - UID返り値型エラー")
-	// }
+	if returnedID != userID {
+		t.Fatalf("failed test %#v", "user_seivece :DeleteUser - UID返り値型エラー")
+	}
 }

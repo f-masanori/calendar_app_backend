@@ -9,7 +9,7 @@ import (
 
 type UserRepository interface {
 	FindAll() (entities.Users, error)
-	CreateUser(string, string) (entities.User, error)
+	CreateUser(string, string, string) (entities.User, error)
 	DeleteUser(int) (int, error)
 	CreateNextEventID(string) (int, error)
 }
@@ -19,7 +19,7 @@ type UserService struct {
 
 func (s *UserService) StoreNewUser(UID string, Email string) (entities.User, error) {
 	//　トランザクション処理を実装する
-	user, err := s.UserRepository.CreateUser(UID, Email)
+	user, err := s.UserRepository.CreateUser(UID, Email, "user")
 	if err != nil {
 		fmt.Println(err)
 		u := entities.User{}
@@ -46,12 +46,12 @@ func (s *UserService) GetAll() (entities.Users, error) {
 }
 
 func (s *UserService) DeleteUser(ID int) (int, error) {
-	returnId, RepErr := s.UserRepository.DeleteUser(ID)
+	returnID, RepErr := s.UserRepository.DeleteUser(ID)
 	if RepErr != nil {
 		fmt.Println(RepErr)
 		return -1, RepErr
 	}
-	return returnId, nil
+	return returnID, nil
 }
 
 /* for test */
